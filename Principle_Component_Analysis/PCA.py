@@ -51,10 +51,10 @@ class Principle_Component_Analysis:
         #print(top_k_eigenvalues)
         #print(sorted_indices[:-k-1:-1])
         top_k_eigenvector = eigenvector[:,sorted_indices[:-k-1:-1]]
-        print(top_k_eigenvector.shape)
-        pca_processing_data = np.dot(corr_matrix,top_k_eigenvector)
-        print(pca_processing_data.shape)
-        return pca_processing_data,eigenvalue
+        #print(top_k_eigenvector.shape)
+        #pca_processing_data = np.dot(corr_matrix,top_k_eigenvector)
+        #print('pca_processing_data',pca_processing_data.shape)
+        return top_k_eigenvector,eigenvalue
 
     #plot line chart
     def plot_line_chart(self,data):
@@ -65,7 +65,11 @@ class Principle_Component_Analysis:
         plt.title('Sorted Eigenvalues Line Chart')
         plt.legend()
         plt.show()
-
+    def restore_image(self,average,data):
+        data = data * 255.0
+        for i in range(len(data)):
+            data[i] = data[i] + average
+        return data
     def MatrixToImage(self,data):
         new_im = Image.fromarray(data.astype(np.uint8))
         return new_im
@@ -75,30 +79,48 @@ if __name__ == '__main__':
     file_path = 'butterfly.bmp'
     pixel_matrix = pca_test.load_data(pca_test,file_path)
     length,width,height = pixel_matrix.shape
-    print(length,width,height)
+    #print(length,width,height)
     red_pixel = np.array(pixel_matrix[:,:,0])
     green_pixel = np.array(pixel_matrix[:,:,1])
     blue_pixel = np.array(pixel_matrix[:,:,2])
-    print(red_pixel)
-    print(red_pixel.shape)
+    #print(red_pixel)
+    #print(red_pixel.shape)
     #data pre-processing handle RGB
     average_1,red_pixel_preprocessing = pca_test.pre_processing(pca_test,red_pixel)
     average_2,green_pixel_preprocessing = pca_test.pre_processing(pca_test,green_pixel)
     average_3,blue_pixel_preprocessing = pca_test.pre_processing(pca_test,blue_pixel)
+    #print('average',average_1)
     #giving the dimensions number after reduction
-    dimension_reduction_k = 50
+    #print('red_pixel',red_pixel_preprocessing)
+    dimension_reduction_k = 5
     result_data_red,eigenvalues_red = pca_test.PCA_main_function(pca_test,red_pixel_preprocessing,dimension_reduction_k)
     result_data_green,eigenvalues_green = pca_test.PCA_main_function(pca_test,green_pixel_preprocessing,dimension_reduction_k)
     result_data_blue,eigenvalues_blue = pca_test.PCA_main_function(pca_test,blue_pixel_preprocessing,dimension_reduction_k)
     result_rgb = np.array([result_data_red.T,result_data_green.T,result_data_blue.T])
-    print(result_rgb.T.shape)
-    pca_test.plot_line_chart(pca_test,eigenvalues_red)
-    pca_test.plot_line_chart(pca_test,eigenvalues_green)
-    pca_test.plot_line_chart(pca_test,eigenvalues_blue)
-    #old_im = pca_test.MatrixToImage(pca_test,pixel_matrix)
-    #old_im.show()
-    #new_im = pca_test.MatrixToImage(pca_test,result_rgb.T)
-    #new_im.show()
+    print('rgb shape',result_rgb)
+    #print('Red shape:',result_data_red.shape)    #243*50        yasuo: 50 * 437  = 50 * 243 times 243 *  437
+    result_data_reduction_red = np.dot(result_data_red.T,red_pixel_preprocessing)
+    result_data_reduction_green = np.dot(result_data_green.T,green_pixel_preprocessing)
+    result_data_reduction_blue = np.dot(result_data_blue.T,blue_pixel_preprocessing)
+    print('test_values',result_data_reduction_red)
+    #result_data_reduction_rgb = np.array([result_data_reduction_red,result_data_reduction_green,result_data_reduction_blue])
+    final_r = np.dot(result_data_red,result_data_reduction_red)
+    final_g = np.dot(result_data_green,result_data_reduction_green)
+    final_b = np.dot(result_data_blue,result_data_reduction_blue)
+    final_r_1 = pca_test.restore_image(pca_test,average_1,final_r)
+    final_g_1 = pca_test.restore_image(pca_test,average_2,final_g)
+    final_b_1 = pca_test.restore_image(pca_test,average_3,final_b)
+    final_rgb = np.array([final_r_1.T,final_g_1.T,final_b_1.T])
+    print(final_rgb.T)
+    #print(result_rgb.T.shape)
+    #reduction_matrix =
+    # pca_test.plot_line_chart(pca_test,eigenvalues_red)
+    # pca_test.plot_line_chart(pca_test,eigenvalues_green)
+    # pca_test.plot_line_chart(pca_test,eigenvalues_blue)
+    old_im = pca_test.MatrixToImage(pca_test,pixel_matrix)
+    old_im.show()
+    new_im = pca_test.MatrixToImage(pca_test,final_rgb.T)
+    new_im.show()
     #green_pixel = pixel_matrix[:,:,1]
     # x_lab = list(range(length))
     # plt.plot(x_lab,eigenvalues)
