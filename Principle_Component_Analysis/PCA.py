@@ -19,9 +19,9 @@ class Principle_Component_Analysis:
         width = input_image.size[0]
         height = input_image.size[1]
         print(input_image)
-        print('Picture size is %d * %d.' %(height,width))
-        #input_image.show()
         image_pixel = np.array(input_image)
+        #print(image_pixel.shape)
+        print('Picture size is %d * %d * %d.' % (image_pixel.shape[0],image_pixel.shape[1],image_pixel.shape[2]))
         return image_pixel
 
     def pre_processing(self,pixel_matrix):
@@ -57,9 +57,11 @@ class Principle_Component_Analysis:
         return top_k_eigenvector,eigenvalue
 
     #plot line chart
-    def plot_line_chart(self,data):
-        x_lab = list(range(len(data)))
-        plt.plot(x_lab,data,label = 'Eigenvalues',color='b')
+    def plot_line_chart(self,data_1,data_2,data_3):
+        x_lab = list(range(len(data_1)))
+        plt.plot(x_lab,data_1,label = 'Red Eigenvalues',color='r')
+        plt.plot(x_lab,data_2,label = 'Green Eigenvalues',color='g')
+        plt.plot(x_lab,data_3,label = 'Blue Eigenvalues',color='b')
         plt.xlabel('Eigenvalues Index')
         plt.ylabel('Eigenvalues')
         plt.title('Sorted Eigenvalues Line Chart')
@@ -92,7 +94,7 @@ if __name__ == '__main__':
     #print('average',average_1)
     #giving the dimensions number after reduction
     #print('red_pixel',red_pixel_preprocessing)
-    dimension_reduction_k = 5
+    dimension_reduction_k = 30
     result_data_red,eigenvalues_red = pca_test.PCA_main_function(pca_test,red_pixel_preprocessing,dimension_reduction_k)
     result_data_green,eigenvalues_green = pca_test.PCA_main_function(pca_test,green_pixel_preprocessing,dimension_reduction_k)
     result_data_blue,eigenvalues_blue = pca_test.PCA_main_function(pca_test,blue_pixel_preprocessing,dimension_reduction_k)
@@ -114,13 +116,15 @@ if __name__ == '__main__':
     print(final_rgb.T)
     #print(result_rgb.T.shape)
     #reduction_matrix =
-    # pca_test.plot_line_chart(pca_test,eigenvalues_red)
+    pca_test.plot_line_chart(pca_test,eigenvalues_red,eigenvalues_green,eigenvalues_blue)
     # pca_test.plot_line_chart(pca_test,eigenvalues_green)
     # pca_test.plot_line_chart(pca_test,eigenvalues_blue)
     old_im = pca_test.MatrixToImage(pca_test,pixel_matrix)
     old_im.show()
+    #old_im.save('old.png')
     new_im = pca_test.MatrixToImage(pca_test,final_rgb.T)
     new_im.show()
+    new_im.save('new_k30.png')
     #green_pixel = pixel_matrix[:,:,1]
     # x_lab = list(range(length))
     # plt.plot(x_lab,eigenvalues)
