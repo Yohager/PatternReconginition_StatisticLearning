@@ -9,3 +9,5 @@ Try to rewrite the .m matlab codes to .py python codes
   3. Softmax Regression
   4. Principle Component Analysis
   5. Singular Values Decomposition
+  6. BackPropogation Algorithm
+  7. Convolutional Neural Network
